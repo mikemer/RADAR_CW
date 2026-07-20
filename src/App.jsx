@@ -85,7 +85,48 @@ function CsvSelectionPage({ onData }) {
   )
 }
 
+const visualizationTypes = [
+  { name: 'Line chart', description: 'Track change and trends across a continuous range.' },
+  { name: 'Bar chart', description: 'Compare values across discrete categories.' },
+  { name: 'Scatter plot', description: 'Explore the relationship between two numeric fields.' },
+  { name: 'Table', description: 'Inspect your source data in a structured view.' },
+]
+
+function VisualizationSelectionPage({ onBack }) {
+  const [selectedType, setSelectedType] = useState(null)
+
+  return (
+    <main className="cw-visualization-page">
+      <div className="cw-page-heading">
+        <p className="cw-eyebrow">Dashboard editor</p>
+        <h1>Choose a visualization</h1>
+        <p>Select the format that best fits the question you want to answer.</p>
+      </div>
+      <section className="cw-visualization-grid" aria-label="Visualization types">
+        {visualizationTypes.map((visualization) => (
+          <button
+            key={visualization.name}
+            type="button"
+            className={`cw-visualization-option${selectedType === visualization.name ? ' is-selected' : ''}`}
+            onClick={() => setSelectedType(visualization.name)}
+            aria-pressed={selectedType === visualization.name}
+          >
+            <span className="cw-visualization-option-name">{visualization.name}</span>
+            <span className="cw-visualization-option-description">{visualization.description}</span>
+          </button>
+        ))}
+      </section>
+      <div className="cw-editor-actions">
+        <button type="button" className="cw-back-button" onClick={onBack}>Back to dashboard</button>
+        {selectedType && <span className="cw-selection-status">{selectedType} selected</span>}
+      </div>
+    </main>
+  )
+}
+
 function DashboardShell({ file, onReset }) {
+  const [isEditing, setIsEditing] = useState(false)
+
   return (
     <div className="cw-app">
       <header className="cw-nav">
@@ -96,30 +137,35 @@ function DashboardShell({ file, onReset }) {
         <div className="cw-nav-center" aria-label="Continuous Wave dashboard">CONTINUOUS WAVE</div>
         <div className="cw-nav-right">
           <span className="cw-nav-file" title={file.name}>{file.name}</span>
+          <button type="button" className="cw-nav-edit" onClick={() => setIsEditing(true)}>Edit</button>
           <button type="button" className="cw-nav-reset" onClick={onReset}>New CSV</button>
         </div>
       </header>
-      <main className="cw-dashboard-placeholder">
-        <div className="cw-placeholder-heading">
-          <p className="cw-eyebrow">CSV loaded</p>
-          <h1>Continuous Wave Dashboard</h1>
-          <p>The dashboard is ready for the first Continuous Wave visualizations.</p>
-        </div>
-        <section className="cw-data-summary" aria-label="Imported CSV summary">
-          <div>
-            <span>Rows</span>
-            <strong>{file.rows.length.toLocaleString()}</strong>
+      {isEditing ? (
+        <VisualizationSelectionPage onBack={() => setIsEditing(false)} />
+      ) : (
+        <main className="cw-dashboard-placeholder">
+          <div className="cw-placeholder-heading">
+            <p className="cw-eyebrow">CSV loaded</p>
+            <h1>Continuous Wave Dashboard</h1>
+            <p>The dashboard is ready for the first Continuous Wave visualizations.</p>
           </div>
-          <div>
-            <span>Columns</span>
-            <strong>{file.columns.length.toLocaleString()}</strong>
-          </div>
-          <div className="cw-columns">
-            <span>Available fields</span>
-            <strong>{file.columns.join(', ')}</strong>
-          </div>
-        </section>
-      </main>
+          <section className="cw-data-summary" aria-label="Imported CSV summary">
+            <div>
+              <span>Rows</span>
+              <strong>{file.rows.length.toLocaleString()}</strong>
+            </div>
+            <div>
+              <span>Columns</span>
+              <strong>{file.columns.length.toLocaleString()}</strong>
+            </div>
+            <div className="cw-columns">
+              <span>Available fields</span>
+              <strong>{file.columns.join(', ')}</strong>
+            </div>
+          </section>
+        </main>
+      )}
     </div>
   )
 }
