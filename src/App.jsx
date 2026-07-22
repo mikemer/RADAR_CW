@@ -469,6 +469,17 @@ function WeeklyWuCountBarChart({ file, config, dateFrom, dateTo }) {
   const severityColumn = getSeverityIdColumn(file.columns)
   const titleColumn = getColumnByNormalizedName(file.columns, 'title')
   const [hoveredWeek, setHoveredWeek] = useState(null)
+  useEffect(() => {
+    function hideBreakdown() {
+      setHoveredWeek(null)
+    }
+    window.addEventListener('resize', hideBreakdown)
+    window.addEventListener('scroll', hideBreakdown, true)
+    return () => {
+      window.removeEventListener('resize', hideBreakdown)
+      window.removeEventListener('scroll', hideBreakdown, true)
+    }
+  }, [])
   const weeklyCounts = new Map()
   file.rows.forEach((row) => {
     const week = getWeekStartIsoDate(row[config.dateColumn])
@@ -501,12 +512,22 @@ function WeeklyWuCountBarChart({ file, config, dateFrom, dateTo }) {
   function showBreakdown(event, week) {
     if (!showAlertBreakdown) return
     const barRect = event.currentTarget.getBoundingClientRect()
-    const left = Math.max(12, Math.min(window.innerWidth - 12, barRect.left + (barRect.width / 2)))
+    const viewportPadding = 12
+    const tooltipWidth = Math.min(420, Math.max(1, window.innerWidth - (viewportPadding * 2)))
+    const availableAbove = Math.max(1, barRect.top - viewportPadding - 8)
+    const availableBelow = Math.max(1, window.innerHeight - barRect.bottom - viewportPadding - 8)
+    const placement = availableAbove >= availableBelow ? 'above' : 'below'
+    const maxHeight = Math.min(360, placement === 'above' ? availableAbove : availableBelow)
+    const left = Math.max(
+      viewportPadding + (tooltipWidth / 2),
+      Math.min(window.innerWidth - viewportPadding - (tooltipWidth / 2), barRect.left + (barRect.width / 2)),
+    )
     setHoveredWeek({
       week,
       left,
-      top: barRect.top > 220 ? barRect.top - 8 : barRect.bottom + 8,
-      placement: barRect.top > 220 ? 'above' : 'below',
+      top: placement === 'above' ? barRect.top - 8 : barRect.bottom + 8,
+      placement,
+      maxHeight,
     })
   }
 
@@ -553,7 +574,7 @@ function WeeklyWuCountBarChart({ file, config, dateFrom, dateTo }) {
         </div>
       </section>
       {hoveredWeek && createPortal(
-        <div className={`cw-daily-wu-breakdown is-${hoveredWeek.placement}`} role="tooltip" style={{ left: `${hoveredWeek.left}px`, top: `${hoveredWeek.top}px` }}>
+        <div className={`cw-daily-wu-breakdown is-${hoveredWeek.placement}`} role="tooltip" style={{ left: `${hoveredWeek.left}px`, top: `${hoveredWeek.top}px`, maxHeight: `${hoveredWeek.maxHeight}px` }}>
           <strong>Week of {formatDateLabel(hoveredWeek.week)}</strong>
           {titleColumn ? (
             <ul>

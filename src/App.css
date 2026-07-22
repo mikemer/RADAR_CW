@@ -959,6 +959,7 @@
 .cw-daily-wu-breakdown {
   position: fixed;
   z-index: 100;
+  box-sizing: border-box;
   width: min(420px, calc(100vw - 24px));
   max-height: min(360px, calc(100vh - 24px));
   overflow: auto;
