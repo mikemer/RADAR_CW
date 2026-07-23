@@ -428,9 +428,8 @@
 }
 
 .cw-dashboard-content {
-  width: min(1120px, 100%);
-  margin: 0 auto;
-  padding: 64px 24px 0;
+  width: 100%;
+  padding: 64px 0.5in 0;
   box-sizing: border-box;
 }
 
@@ -581,10 +580,22 @@
 .cw-workspace-actions {
   display: flex;
   align-items: flex-end;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
+  position: relative;
   margin: 0;
+}
+
+.cw-workspace-primary-actions {
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.cw-workspace-actions .cw-nav-reset {
+  position: absolute;
+  right: 0;
 }
 
 .cw-workspace-actions .cw-workspace-switcher {
@@ -1709,6 +1720,8 @@
   .cw-nav-right { justify-content: space-between; }
 
   .cw-workspace-switcher { flex: 1 1 110px; }
+
+  .cw-workspace-actions .cw-nav-reset { position: static; }
 
   .cw-create-workspace { align-items: stretch; flex-direction: column; }
 

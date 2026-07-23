@@ -545,7 +545,6 @@ function WeeklyWuCountBarChart({ file, config, dateFrom, dateTo }) {
               <div
                 key={week}
                 className="cw-daily-wu-bar-item"
-                title={`Week of ${formatDateLabel(week)}: ${counts.total} WorkUnits`}
                 tabIndex={showAlertBreakdown ? 0 : undefined}
                 onMouseEnter={(event) => showBreakdown(event, week)}
                 onMouseLeave={() => showAlertBreakdown && setHoveredWeek(null)}
@@ -1902,7 +1901,16 @@ function DashboardShell({ file, onReset }) {
                   </div>
                 </div>
               </div>
-              <div className="cw-workspace-actions">
+              <DateRangePicker
+                dateFrom={activeWorkspace.dateFrom ?? ''}
+                dateTo={activeWorkspace.dateTo ?? ''}
+                onChange={setWorkspaceDateRange}
+                onClear={() => setWorkspaceDateRange('', '')}
+              />
+            </div>
+            <div className="cw-workspace-actions">
+              <div className="cw-workspace-primary-actions">
+                <button type="button" className="cw-nav-present" onClick={enterPresentation}>Present</button>
                 <label className="cw-workspace-switcher">
                   <span>Workspace</span>
                   <select value={activeWorkspaceId} onChange={(event) => {
@@ -1912,19 +1920,12 @@ function DashboardShell({ file, onReset }) {
                     {workspaces.map((workspace) => <option key={workspace.id} value={workspace.id}>{workspace.name}</option>)}
                   </select>
                 </label>
-                <DateRangePicker
-                  dateFrom={activeWorkspace.dateFrom ?? ''}
-                  dateTo={activeWorkspace.dateTo ?? ''}
-                  onChange={setWorkspaceDateRange}
-                  onClear={() => setWorkspaceDateRange('', '')}
-                />
                 <button type="button" className="cw-new-workspace-button" onClick={() => setIsWorkspaceDialogOpen(true)}>New workspace</button>
                 <button type="button" className="cw-nav-edit" onClick={() => setView('select')}>Add visualization</button>
                 <button type="button" className="cw-nav-save" onClick={saveWorkspace}>Save workspace</button>
                 {workspaceSaveStatus && <span className="cw-workspace-save-status" role="status">{workspaceSaveStatus}</span>}
-                <button type="button" className="cw-nav-present" onClick={enterPresentation}>Present</button>
-                <button type="button" className="cw-nav-reset" onClick={onReset}>New CSV</button>
               </div>
+              <button type="button" className="cw-nav-reset" onClick={onReset}>New CSV</button>
             </div>
           </div>}
           {isWorkspaceDialogOpen && (
@@ -2013,7 +2014,6 @@ function DashboardShell({ file, onReset }) {
                       <div
                         className="cw-grid-drag-handle"
                         onPointerDown={(event) => beginGridInteraction(event, visualization, 'move')}
-                        title="Drag to move"
                       >
                         <span>Drag to move</span>
                         <div className="cw-grid-item-actions">
@@ -2053,7 +2053,6 @@ function DashboardShell({ file, onReset }) {
                         className="cw-grid-resize-handle"
                         onPointerDown={(event) => beginGridInteraction(event, visualization, 'resize')}
                         aria-label="Resize visualization"
-                        title="Drag to resize"
                       />
                     )}
                   </div>
