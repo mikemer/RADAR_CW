@@ -1399,9 +1399,7 @@ function ShapeCard({ config }) {
     const direction = config.direction ?? 'horizontal'
     const coordinates = direction === 'vertical'
       ? { x1: '50%', y1: '0', x2: '50%', y2: '100%' }
-      : direction === 'diagonal'
-        ? { x1: '0', y1: '100%', x2: '100%', y2: '0' }
-        : { x1: '0', y1: '50%', x2: '100%', y2: '50%' }
+      : { x1: '0', y1: '50%', x2: '100%', y2: '50%' }
     return (
       <svg className="cw-line-shape" aria-label={`${direction} line`} role="img" preserveAspectRatio="none">
         <line {...coordinates} stroke={color} strokeWidth={strokeWidth} vectorEffect="non-scaling-stroke" />
@@ -1451,7 +1449,6 @@ function ShapeConfigurationPage({ initialConfig, type, workspaces, activeWorkspa
             <select value={direction} onChange={(event) => setDirection(event.target.value)}>
               <option value="horizontal">Horizontal</option>
               <option value="vertical">Vertical</option>
-              <option value="diagonal">Diagonal</option>
             </select>
           </label>
         )}
@@ -1618,8 +1615,8 @@ function DashboardShell({ file, onReset }) {
           hasWorkspaceIdentity(workspace) ? 40 : 0,
           ...workspace.visualizations.map((item) => (item.gridY ?? 0) + (item.gridHeight ?? 64)),
         ),
-        gridWidth: type === 'metric' ? 32 : type === 'severity' ? 64 : type === 'label' || type === 'date-label' ? 24 : type === 'daily-wu-count' || type === 'weekly-wu-count' ? 64 : type === 'line' ? 48 : type === 'rectangle' ? 64 : 96,
-        gridHeight: type === 'metric' ? 32 : type === 'severity' ? 32 : type === 'label' || type === 'date-label' ? 16 : type === 'daily-wu-count' || type === 'weekly-wu-count' ? 48 : type === 'line' ? 2 : type === 'rectangle' ? 40 : 64,
+        gridWidth: type === 'metric' ? 32 : type === 'severity' ? 64 : type === 'label' || type === 'date-label' ? 24 : type === 'daily-wu-count' || type === 'weekly-wu-count' ? 64 : type === 'line' ? config.direction === 'vertical' ? 2 : 48 : type === 'rectangle' ? 64 : 96,
+        gridHeight: type === 'metric' ? 32 : type === 'severity' ? 32 : type === 'label' || type === 'date-label' ? 16 : type === 'daily-wu-count' || type === 'weekly-wu-count' ? 48 : type === 'line' ? config.direction === 'vertical' ? 48 : 2 : type === 'rectangle' ? 40 : 64,
       }
       const layout = existingLayout ?? defaultLayout
       return workspace.id === config.workspaceId
