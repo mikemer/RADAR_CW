@@ -74,8 +74,14 @@ function getSeverityIdColumn(columns) {
     ?? columns.find((column) => String(column).replace(/[^a-z0-9]/gi, '').toLowerCase().startsWith('severity'))
 }
 
+function getAlertLabelColumn(columns) {
+  return ['title', 'alertlabel', 'alertname', 'alert', 'name']
+    .map((name) => getColumnByNormalizedName(columns, name))
+    .find(Boolean)
+}
+
 function getHighImpactingWorkUnitColumns(columns) {
-  const title = getColumnByNormalizedName(columns, 'title')
+  const title = getAlertLabelColumn(columns)
   const severity = getSeverityIdColumn(columns)
   return [title, severity].filter(Boolean)
 }
@@ -467,7 +473,7 @@ function rowMatchesDateRange(row, dateColumn, dateFrom, dateTo) {
 function WeeklyWuCountBarChart({ file, config, dateFrom, dateTo }) {
   const tenantColumn = getTenantColumn(file.columns)
   const severityColumn = getSeverityIdColumn(file.columns)
-  const titleColumn = getColumnByNormalizedName(file.columns, 'title')
+  const titleColumn = getAlertLabelColumn(file.columns)
   const [hoveredWeek, setHoveredWeek] = useState(null)
   useEffect(() => {
     function hideBreakdown() {
